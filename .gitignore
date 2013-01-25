@@ -1,0 +1,11 @@
+.DS_Store
+bin/
+log/
+tmp/
+vendor/
+.bundle/
+.sass-cache/
+*.psd
+trash/
+.rbenv-version
+

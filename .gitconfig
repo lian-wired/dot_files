@@ -1,0 +1,38 @@
+[user]
+	name = lian
+	email = lian.wired@gmail.com
+[color]
+	ui = auto
+[alias]
+  b = branch -a
+  br = browse-remote
+  ci = commit
+  co = checkout
+  d = diff
+  dc = diff --cached
+  di = diff
+  dic = diff --cached
+	dw = diff --word-diff
+  f = fetch --prune
+	ld = log --stat -p
+  lf = log --oneline --name-status
+	lgraph = log --oneline --graph --decorate --all
+  lp = log --oneline -n 20 -p
+	ls = status -b
+  s = status --short --branch
+	st = status -sb
+  tr = log --graph --pretty='format:%C(yellow)%h%Creset %s %Cgreen(%an, %ci)%Creset %Cred%d%Creset'
+	untrack = update-index --assume-unchanged
+	retrack = update-index --no-assume-unchanged
+	fp = fetch --prune
+[core]
+  autocrlf = input
+	editor = emacs -nw
+	whitespace = trailing-space
+	excludesfile = $HOME/.gitignore
+[grep]
+	lineNumbers = true
+[push]
+	default = current
+[pull]
+	rebase = true

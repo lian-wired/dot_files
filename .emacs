@@ -2,7 +2,7 @@
 ;; 言語と文字コードの指定
 ;;------------------------------------------------------------------------
 (set-language-environment "Japanese")
-(prefer-coding-system 'utf-8)
+(prefer-coding-system 'utf-8-unix)
 ;;(setq default-file-name-coding-system 'utf-8)
 (setq default-file-name-coding-system 'cp932)
 (set-keyboard-coding-system 'utf-8)
@@ -42,6 +42,7 @@
 
 ;; find-functionをキー割り当てする
 (find-function-setup-keys)
+
 ;;------------------------------------------------------------------------
 ;; load-pathの追加
 ;;------------------------------------------------------------------------
@@ -63,7 +64,7 @@
 
 ;; ELPA/Marmaladeパッケージの設定
 (require 'package)
-(add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
+;;(add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
 (add-to-list 'package-archives '("ELPA" . "http://tromey.com/elpa/"))
 (package-refresh-contents)
 (package-initialize)
@@ -130,18 +131,34 @@
   (color-theme-initialize)
   (color-theme-arjen)
 
-
-;;------------------------------------------------------------------------
 ;; ruby-mode
 ;; (package-install 'ruby-mode)
  (autoload 'ruby-mode "ruby-mode"
    "Mode for editing ruby source files" t)
 (setq auto-mode-alist
-      (append '(("\\.rb$" . ruby-mode)) auto-mode-alist))
+      (append '(
+                ("\\.rb$" . ruby-mode)
+                ("\\.thor$" . ruby-mode)
+                ("\\.ru$" . ruby-mode)) auto-mode-alist))
 (setq interpreter-mode-alist (append '(("ruby" . ruby-mode))
                                      interpreter-mode-alist))
-;; magic-commentはオフ
-(setq ruby-insert-encoding-magic-comment nil)
+
+;; indent調整
+(setq ruby-deep-indent-paren-style nil)
+(defadvice ruby-indent-line (after unindent-closing-paren activate)
+  (let ((column (current-column))
+        indent offset)
+    (save-excursion
+      (back-to-indentation)
+      (let ((state (syntax-ppss)))
+        (setq offset (- column (current-column)))
+        (when (and (eq (char-after) ?\))
+                   (not (zerop (car state))))
+          (goto-char (cadr state))
+          (setq indent (current-indentation)))))
+    (when indent
+      (indent-line-to indent)
+      (when (> offset 0) (forward-char offset)))))
 
 ;; endを自動補完
 (defun ruby-insert-end()
@@ -162,7 +179,7 @@
 (autoload 'inf-ruby-keys "inf-ruby"
   "Set local key defs inf-ruby in ruby-mode")
 (add-hook 'ruby-mode-hook
-	  '(lambda () (inf-ruby-keys)))
+    '(lambda () (inf-ruby-keys)))
 
 ;; ruby-block
 ;;(auto-install-from-emacswiki "ruby-block")
@@ -180,7 +197,7 @@
 (set-face-background 'flymake-warnline "dark slate blue")
 (defun flymake-ruby-init ()
   (let* ((temp-file   (flymake-init-create-temp-buffer-copy
-                       'flymake-create-temp-inplace))
+                       'flymake-create-temp-with-folder-structure))
          (local-file  (file-relative-name
                        temp-file
                        (file-name-directory buffer-file-name))))
@@ -190,27 +207,44 @@
 (push '("Rakefile$" flymake-ruby-init) flymake-allowed-file-name-masks)
 (push '("^\\(.*\\):\\([0-9]+\\): \\(.*\\)$" 1 2 nil 3) flymake-err-line-patterns)
 
-
 (add-hook 'ruby-mode-hook '(lambda ()
     ;; Don't want flymake mode for ruby regions in rhtml files
     (if (not (null buffer-file-name)) (flymake-mode))))
 
 ;; rhtml-mode
 ;; Downloaded from github https://github.com/eschulte/rhtml
+
 (require 'rhtml-mode)
 (setq auto-mode-alist
       (append '(
                 ("\\.erubis$" . rhtml-mode)
                 ("\\.erb$" . rhtml-mode)) auto-mode-alist))
 
-;;---------------------------------------------------------------------
+;; web-mode
+;; (auto-install-from-url "https://raw.github.com/fxbois/web-mode/master/web-mode.el")
+;; (require 'web-mode)
+;; (when (< emacs-major-version 24)
+;;   (defalias 'prog-mode 'fundamental-mode))
+;; (defun web-mode-hook ()
+;;   "Hooks for Web mode."
+;;   (setq web-mode-html-offset   2)
+;;   (setq web-mode-css-offset    2)
+;;   (setq web-mode-script-offset 2)
+;;   (setq web-mode-php-offset    2)
+;;   (setq web-mode-java-offset   2)
+;;   (setq web-mode-asp-offset    2))
+;; (add-hook 'web-mode-hook 'web-mode-hook)
+;; (add-to-list 'auto-mode-alist '("\\.erubis\\'" . web-mode))
+;; (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
 
+
+;;---------------------------------------------------------------------
 ;; js2-mode
-;;(package-install 'js2-mode)
-(require 'js2-mode)
+;; downloaded from github "git://github.com/mooz/js2-mode.git"
+(autoload 'js2-mode "js2-mode" nil t)
+(add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
 (setq js2-indent-on-enter-key t)
 (setq js2-enter-indents-newline t)
-(add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
 (setq js2-basic-offset 2)
 
 
@@ -249,6 +283,11 @@
 (require 'fold-dwim)
 
 
+;;---------------------------------------------------------------------
+;; sass-mode
+(require 'sass-mode)
+(add-to-list 'auto-mode-alist '("\\.sass\\'" . sass-mode))
+
 
 ;;------------------------------------------------------------------------
 ;; Evernote-Emacs-Mode
@@ -272,11 +311,11 @@
 ;;(package-install 'markdown-mode)
 (require 'markdown-mode)
 (setq auto-mode-alist (append '(
-				("\\.md$" . markdown-mode)
-				("\\.text$" . markdown-mode)
-				("\\.markdown$" . markdown-mode)
-				)
-			      auto-mode-alist))
+        ("\\.md$" . markdown-mode)
+        ("\\.text$" . markdown-mode)
+        ("\\.markdown$" . markdown-mode)
+        )
+            auto-mode-alist))
 
 ;; Download Markdown.pl v1.0.2b8
 ;; http://daringfireball.net/projects/downloads/Markdown_1.0.2b8.tbz
@@ -304,6 +343,44 @@
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 
+;; jkhlでフレームサイズを切り替え
+(defun window-resizer ()
+  "Control window size and position."
+  (interactive)
+  (let ((window-obj (selected-window))
+        (current-width (window-width))
+        (current-height (window-height))
+        (dx (if (= (nth 0 (window-edges)) 0) 1
+              -1))
+        (dy (if (= (nth 1 (window-edges)) 0) 1
+              -1))
+        action c)
+    (catch 'end-flag
+      (while t
+        (setq action
+              (read-key-sequence-vector (format "size[%dx%d]"
+                                                (window-width)
+                                                (window-height))))
+        (setq c (aref action 0))
+        (cond ((= c ?l)
+               (enlarge-window-horizontally dx))
+              ((= c ?h)
+               (shrink-window-horizontally dx))
+              ((= c ?j)
+               (enlarge-window dy))
+              ((= c ?k)
+               (shrink-window dy))
+              ;; otherwise
+              (t
+               (let ((last-command-char (aref action 0))
+                     (command (key-binding action)))
+                 (when command
+                   (call-interactively command)))
+               (message "Quit")
+               (throw 'end-flag t)))))))
+
+;; C-c C-rにwindow-resizerを割り当て
+(global-set-key "\C-c\C-r" 'window-resizer)
 ;; ------------------------------------------------------------------------
 ;; @ buffer
 ;; ------------------------------------------------------------------------
@@ -312,6 +389,14 @@
 
 ;; ウィンドウ縦分割時のバッファ画面外文字の切り詰め表示
 (setq truncate-partial-width-windows t)
+(defun toggle-truncate-partial-windows ()
+  "折り返し表示をトグル動作します."
+  (interactive)
+  (if truncate-partial-width-windows
+      (setq truncate-partial-width-windows nil)
+    (setq truncate-partial-width-windows t))
+  (recenter))
+
 
 ;; 同一バッファ名にディレクトリ付与
 (require 'uniquify)
@@ -329,8 +414,8 @@
 ;; 行番号のフォーマット
 ;; (set-face-attribute 'linum nil :foreground "red" :height 0.8)
 (set-face-attribute 'linum nil
-		    :height 0.9
-		    :foreground "#ccc")
+        :height 0.9
+        :foreground "#ccc")
 (setq linum-format "%4d")
 
 ;; ------------------------------------------------------------------------
@@ -426,7 +511,6 @@
 (setq-default show-trailing-whitespace t)
 (set-face-background 'trailing-whitespace "#b12770")
 
-
 ;; タブをスペースで扱う
 (setq-default indent-tabs-mode nil)
 (custom-set-variables '(tab-width 2))
@@ -447,6 +531,20 @@
 ;; フレームの透明度
 (add-to-list 'default-frame-alist '(alpha . 85))
 (set-frame-parameter nil 'alpha 85)
+
+;; windows.el
+;; (install-elisp "http://www.gentei.org/~yuuji/software/revive.el")
+;; (install-elisp "http://www.gentei.org/~yuuji/software/windows.el")
+(require 'windows)
+(setq win:use-frame nil)
+(win:startup-with-window)
+(winner-mode 1)
+;; 直前のフレーム構成に戻す
+(global-unset-key (kbd "M-u"))
+(global-set-key (kbd "M-u") 'winner-undo)
+;; 次(前)のウィンドウへ
+(global-set-key (kbd "C-M-,") 'win-prev-window)
+(global-set-key (kbd "C-M-.") 'win-next-window)
 
 
 
@@ -483,8 +581,8 @@
 
 ;; undo-tree
 ;;(package-install 'undo-tree)
-;;(require 'undo-tree)
-;;(global-undo-tree-mode)
+(require 'undo-tree)
+(global-undo-tree-mode)
 
 ;; ファイルを自動保存
 ;;(auto-install-from-url "http://homepage3.nifty.com/oatu/emacs/archives/auto-save-buffers.el")
@@ -514,7 +612,7 @@
 (setq delete-old-versions t)
 
 ;; find-file-at-point
-(ffap-bindings)
+;; (ffap-bindings)
 
 ;; ------------------------------------------------------------------------
 ;; @ dired
@@ -527,7 +625,6 @@
 
 ;; ------------------------------------------------------------------------
 ;; @ key bind
-;; ------------------------------------------------------------------------
 ;(setq indent-line-function 'indent-relative-maybe)
 (global-set-key "\C-m" 'newline-and-indent)
 (global-set-key "\C-m" 'indent-new-comment-line)
@@ -536,10 +633,13 @@
 ;;(global-set-key "\C-z"          'scroll-down)
 
 ;; C-c lで折り返しon/off
-(global-set-key (kbd "C-c l") 'toggle-truncate-lines)
+;; (global-set-key (kbd "C-c l") 'toggle-truncate-lines)
+(global-set-key (kbd "C-c l") 'toggle-truncate-partial-windows)
+
 
 ;; C-tでウィンドウ切り替え
 (global-set-key (kbd "C-t") 'other-window)
+(define-key dired-mode-map "\C-t" 'other-window)
 
 ;; M-gでgoto-line
 (global-set-key (kbd "M-g") 'goto-line)
@@ -547,6 +647,9 @@
 ;; C-hでbackspace
 ;;(keyboard-translate ?\C-h ?\C-?)
 (global-set-key "\C-h" 'delete-backward-char)
+
+;; C-tabでindent-region
+(global-set-key [C-tab] 'indent-region)
 
 ;; smartrep
 (require 'smartrep)
@@ -566,25 +669,25 @@
 ;; @ cmigemo
 ;; ------------------------------------------------------------------------
 
-(require 'migemo)
-(setq migemo-command "cmigemo")
+;; (require 'migemo)
+;; (setq migemo-command "cmigemo")
 
-(setq migemo-options '("-q" "--emacs"))
-;; ;; migemo-dictのパス
-(setq migemo-dictionary "~/.emacs.d/elisp/migemo/dict/utf-8/migemo-dict")
-;; ;;(setq migemo-dictionary "~/.emacs.d/elisp/migemo/dict/cp932/migemo-dict")
-;; (setq migemo-dictionary "~/.emacs.d/elisp/migemo/dict/euc-jp/migemo-dict")
-(setq migemo-user-dictionary nil)
-(setq migemo-regex-dictionary nil)
+;; (setq migemo-options '("-q" "--emacs"))
+;; ;; ;; migemo-dictのパス
+;; (setq migemo-dictionary "~/.emacs.d/elisp/migemo/dict/utf-8/migemo-dict")
+;; ;; ;;(setq migemo-dictionary "~/.emacs.d/elisp/migemo/dict/cp932/migemo-dict")
+;; ;; (setq migemo-dictionary "~/.emacs.d/elisp/migemo/dict/euc-jp/migemo-dict")
+;; (setq migemo-user-dictionary nil)
+;; (setq migemo-regex-dictionary nil)
 
-;; ;;キャッシュ機能を利用
-(setq migemo-use-pattern-alist t)
-(setq migemo-use-frequent-pattern-alist t)
-(setq migemo-pattern-alist-length 1024)
-;; ;; 辞書の文字コードを指定
-(setq migemo-coding-system 'utf-8)
-(load-library "migemo")
-(migemo-init)
+;; ;; ;;キャッシュ機能を利用
+;; (setq migemo-use-pattern-alist t)
+;; (setq migemo-use-frequent-pattern-alist t)
+;; (setq migemo-pattern-alist-length 1024)
+;; ;; ;; 辞書の文字コードを指定
+;; (setq migemo-coding-system 'utf-8)
+;; (load-library "migemo")
+;; (migemo-init)
 
 ;; 日本語整形
 ;;(require 'text-adjust)
@@ -601,6 +704,8 @@
 (define-key global-map (kbd "M-y") 'anything-show-kill-ring)
 (global-set-key (kbd "C-:") 'anything-for-files)
 (setq descbinds-anything-window-style 'split-window)
+(add-to-list 'descbinds-anything-source-template '(candidate-number-limit . 150))
+
 ;; (when (require 'anything nil t)
 ;;   (setq
 ;;    ;; 候補を表示するまでの時間.default=0.5
@@ -657,20 +762,20 @@
    (after save-after-moccur-edit-buffer activate)
    (save-buffer))
 
-;; ;; anything-c-moccur.el
-;; (require 'anything-c-moccur)
-;; (when (require 'anything-c-moccur nil t)
-;;   (setq
-;;    ;; anything-c-moccur用 `anything-idle-delay'
-;;    anything-c-moccur-anything-idle-delay 0.1
-;;    ;; バッファの情報をハイライト
-;;    anything-c-moccur-highligt-info-line-flag t
-;;    ;; 現在選択中の候補の位置をほかのwindowに表示
-;;    anything-c-moccur-enable-auto-look-flag t
-;;    ;; 起動時にポイントの位置の単語を初期パターンにする
-;;    anything-c-moccur-enable-initial-pattern t)
-;;   ;; C-M-oにanything-c-moccur-occur-by-moccurを割り当て
-;;   (global-set-key (kbd "C-M-o") 'anything-c-moccur-occur-by-moccur))
+;; anything-c-moccur.el
+(require 'anything-c-moccur)
+(when (require 'anything-c-moccur nil t)
+  (setq
+   ;; anything-c-moccur用 `anything-idle-delay'
+   anything-c-moccur-anything-idle-delay 0.1
+   ;; バッファの情報をハイライト
+   anything-c-moccur-highligt-info-line-flag t
+   ;; 現在選択中の候補の位置をほかのwindowに表示
+   anything-c-moccur-enable-auto-look-flag t
+   ;; 起動時にポイントの位置の単語を初期パターンにする
+   anything-c-moccur-enable-initial-pattern t)
+  ;; C-M-oにanything-c-moccur-occur-by-moccurを割り当て
+  (global-set-key (kbd "C-M-o") 'anything-c-moccur-occur-by-moccur))
 
 ;; ;; anything-rurima.el
 ;; (require 'anything-rurima)
@@ -686,41 +791,7 @@
 (when (require 'yaml-mode nil t)
   (add-to-list 'auto-mode-alist '("\\.yml$" . yaml-mode)))
 
-;; ------------------------------------------------------------------------
-;; Subversionの設定
-;; ------------------------------------------------------------------------
-;; (when (executable-find "svn")
-;;   (setq svn-status-verbose nil)
-;;   (autoload 'svn-status "psvn" "Run `svn status'." t))
 
-;; ------------------------------------------------------------------------
-;; Git
-;; ------------------------------------------------------------------------
-;; (when (executable-find "git")
-;;   (require 'egg nil t))
-
-;; ------------------------------------------------------------------------
-;; Woman&manでキャッシュを作成
-;; ------------------------------------------------------------------------
-;; (setq woman-cache-filename "~/.emacs.d/.wmncash.el")
-
-;; ------------------------------------------------------------------------
-;; Anythingでman検索
-;; ------------------------------------------------------------------------
-;; (setq anything-for-document-sources
-;;       (list anything-c-source-man-pages
-;;             anything-c-source-info-cl
-;;             anything-c-source-info-pages
-;;             anything-c-source-info-elisp
-;;             anything-c-source-apropos-emacs-commands
-;;             anything-c-source-apropos-emacs-functions
-;;             anything-c-source-apropos-emacs-variables))
-;; (defun anything-for-document ()
-;;   "Preconfigured `anything' for anything-for-document."
-;;   (interactive)
-;;   (anything anything-for-document-sources
-;;             (thing-at-point 'symbol) nil nil nil
-;;             "*anything for document*"))
 ;; ------------------------------------------------------------------------
 ;; eshellの設定
 ;; ------------------------------------------------------------------------;
@@ -850,14 +921,6 @@
 ;; ホームディレクトリに移動
 (cd "~")
 
-
-
-;; シェルの設定
-;;(setq explicit-shell-file-name "~/nyaos/nyaos.exe")
-;;(setq shell-file-name "~/nyaos/nyaos.exe")
-;;(setq shell-command-option nil)
-;;(setq shell-command-switch "\\/c")
-
 ;;sequential command
 ;;(auto-install-batch "sequential-command")
 (require 'sequential-command-config)
@@ -868,6 +931,13 @@
 (require 'zencoding-mode)
 (add-hook 'rhtml-mode-hook 'zencoding-mode)
 (add-hook 'html-mode-hook 'zencoding-mode)
+(define-key zencoding-mode-keymap (kbd "C-j") 'reindent-then-newline-and-indent)
+(define-key zencoding-mode-keymap (kbd "C-c C-m") 'zencoding-expand-line)
+(define-key zencoding-preview-keymap (kbd "C-c C-m") 'zencoding-preview-accept)
+(setq zencoding-inline-tags
+      (append
+       '("th" "td" )
+       zencoding-inline-tags))
 
 
 ;; magitの設定
@@ -876,6 +946,20 @@
     (setq magit-git-executable "C:/Program Files/Git/bin/git.exe"))
 ;; vc-dirコマンドにmagit-statusを上書き
  (global-set-key (kbd "C-x v d") 'magit-status)
+
+
+;; ;; ↓こいつをnon-nilにしておくと、vcsによる変更もチェックしてくれる
+;; (setq auto-revert-check-vc-info nil)
+
+;; ;; こちらは変更する必要ないけど、早いほうがいいので1とかしてみた
+;; (setq auto-revert-interval 10)
+
+(add-hook 'find-file-hook
+          '(lambda ()
+             (when
+                 (and buffer-file-name
+                      (vc-backend buffer-file-name))
+               (auto-revert-mode))))
 
 ;; (defun my-show-git-current-branch ()
 ;;   (interactive)
@@ -890,28 +974,11 @@
 ;; (add-hook 'dired-mode-hook 'my-set-git-current-branch)
 ;; (add-hook 'find-file-hook  'my-set-git-current-branch)
 
+;; regexp
+;; (auto-install-from-url "https://raw.github.com/k-talo/foreign-regexp.el/master/foreign-regexp.el")
+(require 'foreign-regexp)
+(custom-set-variables
+ ;; 正規表現、perlかrubyを選択
+ '(foreign-regexp/regexp-type 'ruby) ;; Choose by your preference.
+ '(reb-re-syntax 'foreign-regexp)) ;; Tell re-builder to use foreign regexp.
 
-;; yasnippet.el
-;; download from github
-;; $ cd ~/.emacs.d/plugins
-;; $ git clone https://github.com/capitaomorte/yasnippet
-;; copy yasnippet.el to ~/.emacs.d/elisp
-;;(auto-install-from-emacswiki "yasnippet-config.el")
-;;(require 'yasnippet-config)
-;;(yas/setup "~/.emacs.d/plugins/yasnippet")
-
-
-;; cn-outline.el
-(require 'cn-outline)
-(add-hook 'ruby-mode-hook
-          '(lambda ()
-             (cn-outline-mode t)))
-(add-hook 'rhtml-mode-hook
-          '(lambda ()
-             (cn-outline-mode t)))
-(add-hook 'js2-mode-hook
-          '(lambda ()
-             (cn-outline-mode t)))
-;; ------------------------------------------------------------------------
-;; End OF .emacs
-;; ------------------------------------------------------------------------
