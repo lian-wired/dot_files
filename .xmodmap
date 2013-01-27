@@ -1,0 +1,5 @@
+add mod1 = Muhenkan
+add mod1 = Hiragana_Katakana
+remove Lock = Caps_Lock
+keysym Caps_Lock = Control_L
+add Control = Control_L

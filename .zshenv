@@ -12,3 +12,6 @@ export PATH
 
 eval "$(rbenv init -)"
 
+# key remap
+xmodmap ~/.xmodmap
+
