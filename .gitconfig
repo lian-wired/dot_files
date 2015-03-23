@@ -13,6 +13,7 @@
   di = diff
   dic = diff --cached
 	dw = diff --word-diff
+  ddd = diff --color-words --word-diff-regex='\\w+|[^[:space:]]'
   f = fetch --prune
 	ld = log --stat -p
   lf = log --oneline --name-status
@@ -25,11 +26,13 @@
 	untrack = update-index --assume-unchanged
 	retrack = update-index --no-assume-unchanged
 	fp = fetch --prune
+  grep = grep -in
 [core]
   autocrlf = input
-	editor = emacs -nw
+  editor = "/usr/bin/emacsclient -t" --alternate-editor /usr/local/bin/emacs
 	whitespace = trailing-space
 	excludesfile = $HOME/.gitignore
+	pager = less -x3
 [grep]
 	lineNumbers = true
 [push]
