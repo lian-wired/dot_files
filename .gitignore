@@ -8,4 +8,13 @@ vendor/
 *.psd
 trash/
 .rbenv-version
-
+.emacs.d/ac-comphist.dat
+.emacs.d/auto-save-list/
+.emacs.d/backups/
+.emacs.d/bookmarks
+.emacs.d/**/*~
+.emacs.d/eshell/
+.emacs.d/history
+.emacs.d/session*
+.emacs.d/tramp
+.emacs.d/url/cookies
