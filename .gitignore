@@ -18,3 +18,4 @@ trash/
 .emacs.d/session*
 .emacs.d/tramp
 .emacs.d/url/cookies
+.weechat/logs/
