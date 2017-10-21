@@ -7,10 +7,7 @@ alias E='emacsclient -t'
 alias kill-emacs="emacsclient -e '(kill-emacs)'"
 
 # rbenv
-PATH=$PATH:$HOME/.rbenv/bin:$HOME/local/bin:$HOME/.gem/ruby/1.8/bin
+PATH=$PATH:$HOME/.rbenv/bin:$HOME/local/bin:$HOME/dev/shell_script
 export PATH
 
 eval "$(rbenv init -)"
-
-
-
