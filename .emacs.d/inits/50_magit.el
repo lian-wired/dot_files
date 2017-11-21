@@ -32,12 +32,3 @@
 (add-hook 'dired-mode-hook 'my-set-git-current-branch)
 (add-hook 'find-file-hook  'my-set-git-current-branch)
 
-;; git-commit-mode
-(when (require 'git-commit nil t)
-  (setq auto-mode-alist
-        (append '(
-                  ("COMMIT_EDITMSG$" . git-commit-mode)) auto-mode-alist))
-  (set-face-foreground 'git-commit-summary-face nil)
-  (set-face-underline  'git-commit-summary-face t)
-  (set-face-foreground 'git-commit-nonempty-second-line-face nil)
-  (set-face-bold-p     'git-commit-nonempty-second-line-face nil))

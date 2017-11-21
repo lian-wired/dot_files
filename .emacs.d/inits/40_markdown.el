@@ -14,4 +14,4 @@
 ;; and Patch Markdown Extra for perl
 ;; Markdown Extra for perl
 ;; http://www.sera.desuyo.net/komono/Markdown_1.0.2b8-extra.patch
-(setq markdown-command "perl ~/app/Markdown/Markdown.pl")
+(setq markdown-command "multimarkdown")

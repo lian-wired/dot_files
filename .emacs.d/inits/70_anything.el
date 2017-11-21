@@ -8,8 +8,8 @@
 (setq anything-enable-shortcuts 'alphabet)
 (define-key global-map (kbd "M-y") 'anything-show-kill-ring)
 (define-key global-map (kbd "C-:") 'anything-filelist+)
-(setq descbinds-anything-window-style 'split-window)
-(add-to-list 'descbinds-anything-source-template '(candidate-number-limit . 150))
+;; (setq descbinds-anything-window-style 'split-window)
+;; (add-to-list 'descbinds-anything-source-template '(candidate-number-limit . 150))
 
 ;; (when (require 'anything nil t)
 ;;   (setq

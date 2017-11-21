@@ -19,4 +19,13 @@
 (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.haml\\'" . haml-mode))
 
+;; 色文字列に色をつける
+(setq rainbow-html-colors t)
+(setq rainbow-x-colors t)
+(setq rainbow-latex-colors t)
+(setq rainbow-ansi-colors t)
+(add-hook 'css-mode-hook 'rainbow-mode)
+(add-hook 'scss-mode-hook 'rainbow-mode)
+(add-hook 'html-mode-hook 'rainbow-mode)
+
 

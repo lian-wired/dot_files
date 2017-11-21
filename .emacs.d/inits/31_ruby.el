@@ -62,26 +62,4 @@
 (setq ruby-block-highlight-toggle t)
 (ruby-block-mode t)
 
-;;  flymake for ruby
-;; (package-install 'flymake)
-;; (package-install 'flymake-ruby)
-(require 'flymake-ruby)
-(set-face-background 'flymake-errline "red4")
-(set-face-background 'flymake-warnline "dark slate blue")
-(defun flymake-ruby-init ()
-  (let* ((temp-file   (flymake-init-create-temp-buffer-copy
-                       'flymake-create-temp-with-folder-structure))
-         (local-file  (file-relative-name
-                       temp-file
-                       (file-name-directory buffer-file-name))))
-    (list "ruby" (list "-c" local-file))))
-;; Invoke ruby with '-c' to get syntax checking
-(push '(".+\\.rb$" flymake-ruby-init) flymake-allowed-file-name-masks)
-(push '("Rakefile$" flymake-ruby-init) flymake-allowed-file-name-masks)
-(push '("^\\(.*\\):\\([0-9]+\\): \\(.*\\)$" 1 2 nil 3) flymake-err-line-patterns)
-(add-hook 'ruby-mode-hook '(lambda ()
-    ;; Don't want flymake mode for ruby regions in rhtml files
-    (if (not (null buffer-file-name)) (flymake-mode))))
-
-
 

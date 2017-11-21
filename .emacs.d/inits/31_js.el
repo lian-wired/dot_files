@@ -9,9 +9,3 @@
 (setq js2-enter-indents-newline t)
 (setq js2-basic-offset 2)
 
-
-;; ;; fly-jshint-wsh
-;; ;;(package-install 'flymake-jslint)
-(add-hook 'js-mode-hook 'flymake-jslint-load)
-
-

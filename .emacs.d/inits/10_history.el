@@ -1,12 +1,15 @@
 ;;history
 
 ;; 最近使ったファイルをメニューに表示
-;; (auto-install-from-emacswiki "recentf-ext.el")
-;; (require 'recentf-ext)
-;; (recentf-mode t)
+(setq recentf-max-saved-items 500)
+;; 最近使ったファイルに加えないファイルを
+;; 正規表現で指定する
+(setq recentf-exclude
+      '("/TAGS$" "/var/tmp/"))
+(require 'recentf-ext)
 
 ;; 最近使ったファイルの表示数
-;;(setq recentf-max-menu-items 10)
+(setq recentf-max-menu-items 10)
 
 ;; 最近使ったファイルの保存数
 ;;(setq recentf-max-saved-items 3000)
@@ -28,33 +31,11 @@
 (require 'undo-tree)
 (global-undo-tree-mode)
 
-;; ファイルを自動保存
-;;download-from http://homepage3.nifty.com/oatu/emacs/archives/auto-save-buffers.el
-(require 'auto-save-buffers)
-(run-with-idle-timer 2 t 'auto-save-buffers)
-
 ;; backupを作成しない
 (setq make-backup-files nil)
 
-;; 編集中ファイルのバックアップ間隔（秒）
-(setq auto-save-timeout 15)
-
-;; 編集中ファイルのバックアップ間隔（打鍵）
-(setq auto-save-interval 60)
-
-;; 編集中ファイルのバックアップ先 ~/.emacs.d/backups/
-(setq auto-save-file-name-transforms
-      `((".*" ,"~/.emacs.d/backups/" t)))
-
-;; バックアップファイルの作成場所 ~/.emacs.d/backups/
-(setq backup-directory-alist
-      (cons (cons "\\.*$" (expand-file-name "~/.emacs.d/backups"))
-            backup-directory-alist))
-
-;; バックアップ世代数
-;; (setq kept-old-versions 1)
-;; (setq kept-new-versions 2)
-
-;; 古いバックアップファイルの削除
-;; (setq delete-old-versions t)
+(require 'real-auto-save)
+(setq real-auto-save-interval 3)        ;3秒後に自動保存
+;; (add-hook 'prog-mode-hook 'real-auto-save-mode)
+(add-hook 'find-file-hook 'real-auto-save-mode)
 

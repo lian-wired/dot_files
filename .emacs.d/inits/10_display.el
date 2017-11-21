@@ -116,13 +116,6 @@
 (setq hl-line-face 'hlline-face)
 (global-hl-line-mode)
 
-;; 現在桁もハイライト
-;;(auto-install-batch "crosshairs")
-;;(require 'crosshairs)
-;;(crosshairs-mode 0)
-;;(crosshairs-toggle-when-idle 4)
-;;(col-highlight-set-interval 1)
-
 
 ;; スクロール時のカーソル位置の維持
 (setq scroll-preserve-screen-position t)
