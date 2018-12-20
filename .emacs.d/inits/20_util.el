@@ -32,6 +32,7 @@
 
 ;; ;;;試行錯誤用ファイルを開くための設定
 (require 'open-junk-file)
+(setq open-junk-file-find-file-function 'find-file)
 (global-set-key (kbd "C-z") 'open-junk-file)
 
 ;; クリップボードをkill-ringと同期

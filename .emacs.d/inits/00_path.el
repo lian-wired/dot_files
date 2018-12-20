@@ -28,8 +28,8 @@
 ;; auto-install
 (require 'auto-install)
 
-(auto-install-update-emacswiki-package-name t)
-(auto-install-compatibility-setup)
+;; (auto-install-update-emacswiki-package-name t)
+;; (auto-install-compatibility-setup)
 
 ;;自動バイトコンパイルを無効にするファイル名の正規表現
 (require 'auto-async-byte-compile)

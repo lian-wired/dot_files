@@ -1,5 +1,3 @@
-;; js2-mode
-;; downloaded from github "git://github.com/mooz/js2-mode.git"
 (autoload 'js2-mode "js2-mode" nil t)
 (setq auto-mode-alist
       (append '(
@@ -8,4 +6,5 @@
 (setq js2-indent-on-enter-key t)
 (setq js2-enter-indents-newline t)
 (setq js2-basic-offset 2)
+(setq js-indent-level 2)
 

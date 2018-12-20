@@ -62,4 +62,7 @@
 (setq ruby-block-highlight-toggle t)
 (ruby-block-mode t)
 
+; magic-commentはつけない
+(custom-set-variables
+ '(ruby-insert-encoding-magic-comment nil))
 
