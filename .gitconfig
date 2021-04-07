@@ -41,7 +41,8 @@
 [pull]
 	rebase = true
 [credential]
-	helper = gnomekeyring
+	helper = /usr/share/doc/git/contrib/credential/libsecret/git-credential-libsecret
+
 [pager]
   log  = (diff-highlight 2>/dev/null || cat) | ${PAGER:-less}
   show = (diff-highlight 2>/dev/null || cat) | ${PAGER:-less}
@@ -55,3 +56,5 @@
 	process = git-lfs filter-process
 	required = true
 	clean = git-lfs clean -- %f
+[init]
+	defaultBranch = master

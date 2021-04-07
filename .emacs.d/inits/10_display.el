@@ -120,7 +120,9 @@
 (show-paren-mode t)
 (setq show-paren-delay 0)
 (setq show-paren-style 'expression)
-(set-face-background 'show-paren-match-face "#500")
+(set-face-attribute 'show-paren-match nil
+      :background "#500"
+      :underline nil)
 
 ;; 選択領域の色
 (set-face-background 'region "#00c")

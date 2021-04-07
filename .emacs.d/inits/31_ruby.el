@@ -66,3 +66,15 @@
 (custom-set-variables
  '(ruby-insert-encoding-magic-comment nil))
 
+;; frozen-string-literalをつける
+(defun ruby-mode-set-frozen-string-literal-true ()
+  (interactive)
+  (when (eq major-mode 'ruby-mode)
+    (save-excursion
+      (widen)
+      (goto-char (point-min))
+      (unless (looking-at "^# frozen_string_literal")
+        (insert "# frozen_string_literal: true\n\n")))))
+
+(define-key ruby-mode-map "\C-c\C-f" 'ruby-mode-set-frozen-string-literal-true)
+
